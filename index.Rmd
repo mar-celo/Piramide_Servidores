@@ -29,6 +29,10 @@ library(tidyverse)
 library(scales)
 df_aposen <- readRDS("data/df_aposen.rds")
 
+df_aposen <- df_aposen |> mutate(
+  CO_SEXO = factor(CO_SEXO, levels = c("M", "F"))
+)
+
 grafico <- df_aposen %>%
   ggplot(aes(
     x = faixa_etaria_aposen,
@@ -37,7 +41,7 @@ grafico <- df_aposen %>%
   )
   ) +
   geom_bar(stat = "identity") +
-  scale_fill_manual(values = c("#FF7F0E","#004580")) +
+  scale_fill_manual(values = c("#004580", "#FF7F0E")) +
   scale_y_continuous(
     breaks=seq(-85000,105000,25000),
     labels=paste0(
@@ -115,6 +119,10 @@ grafico <- grafico + theme(
 
 df_final <- readRDS("data/df_ativos.rds")
 
+df_final <- df_final |> mutate(
+  CO_SEXO = factor(CO_SEXO, levels = c("M", "F"))
+)
+
 grafico_sem_rotulo <- df_final  |> 
   ggplot(aes(
     x = faixa_etaria,
@@ -122,7 +130,7 @@ grafico_sem_rotulo <- df_final  |>
     fill = CO_SEXO
   )) +
   geom_bar(stat = "identity") +
-  scale_fill_manual(values = c("#FF7F0E","#004580")) +
+  scale_fill_manual(values = c("#004580", "#FF7F0E")) +
 scale_y_continuous(
     breaks = seq(-105000, 80000, 45000),
     labels = paste0(abs(seq(-105000, 80000, 45000)))
@@ -225,7 +233,7 @@ grafico_sem_rotulo <- df_final %>%
   )
   ) +
   geom_bar(stat = "identity") +
-  scale_fill_manual(values = c("#FF7F0E","#004580")) +
+  scale_fill_manual(values = c("#004580", "#FF7F0E")) +
   scale_y_continuous(
     breaks = seq(-105000, 80000, 45000),
     labels = paste0(abs(seq(-105000, 80000, 45000)))
@@ -326,7 +334,7 @@ grafico <- df_final %>%
     fill = CO_SEXO
   )) +
   geom_bar(stat = "identity") +
-  scale_fill_manual(values = c("#FF7F0E", "#004580")) +
+  scale_fill_manual(values = c("#004580", "#FF7F0E")) +
   scale_y_continuous(
     breaks = seq(-105000, 80000, 45000),
     labels = paste0(abs(seq(-105000, 80000, 45000)))
@@ -413,10 +421,10 @@ graf_linha <- df_final |> dplyr::filter(
 
 graf_linha|> 
   e_chart( x = Ano) |> 
-  e_line(serie = `F`) |> 
   e_line(serie = `M`) |> 
+  e_line(serie = `F`) |>
   e_color(
-    c("#FF7F0E", "#004580"),
+    c( "#004580", "#FF7F0E"),
     "#d3d3d3"
   ) |> 
     e_x_axis(
