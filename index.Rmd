@@ -1,0 +1,411 @@
+---
+title: "Infográfico de Projeção de Aposentadoria e Pirâmide Etária"
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, comment = '', fig.width = 8, fig.height = 8)
+```
+
+# Variável do Tabelão ANO_PRE_APO
+
+Aproximadamente 75% das observações estão zeradas
+
+
+```{r}
+df <- vroom::vroom("X:/Teste/Marcelo/Piramide/piramide.csv")
+
+df |> ggplot2::ggplot() +
+  ggplot2::aes(x =  ANO_PREV_APO) +
+  ggplot2::geom_histogram(fill = "grey") + 
+  ggplot2::theme_minimal()
+```
+
+
+# Piramide Etária dos Aposentados
+
+```{r}
+library(tidyverse)
+df_aposen <- readRDS("data/df_aposen.rds")
+
+grafico <- df_aposen %>%
+  ggplot(aes(
+    x = faixa_etaria_aposen,
+    y = Total,
+    fill = CO_SEXO
+  )
+  ) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("#FF7F0E","#004580")) +
+  scale_y_continuous(
+    breaks=seq(-55000,50000,25000),
+    labels=paste0(
+      abs(seq(-55000,50000,25000)
+          ))
+    )+
+  coord_flip() + 
+  geom_text(aes(label = abs(Total)), 
+            hjust = ifelse(df_aposen$Total < 0, 1, -0.1),
+    #         position = position_stack(vjust = 0.5),
+    color = "#343a40",
+            size = 3)
+
+grafico <- grafico +
+  labs(
+    title = "Distribuição Etária dos Servidores Aposentados",
+    #subtitle = "\nAposentados",
+    fill = "Sexo",
+    y = "Total de Servidores",
+    caption = "\nFonte: https://www.gov.br/servidor/pt-br/observatorio-de-pessoal-govbr/"
+  )
+
+grafico <- grafico + theme(
+  plot.background = element_blank(),
+  axis.ticks = element_blank(),
+  axis.title.y = element_blank(),
+  legend.title = element_blank(),
+  panel.background = element_blank(),
+  panel.border = element_blank(),
+  strip.background = element_blank(),
+  strip.text.x = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.grid.major = element_blank(),
+  axis.text = element_text(size = 10),
+  legend.position = "bottom",
+  legend.key.size = unit(0.5, "cm"),
+  legend.text = element_text(
+    size = 10,
+    face = "bold"
+  ),
+  plot.title = element_text(
+    size = 15,
+    hjust = 0.5,
+    face = "bold",
+    colour = "#343a40"
+  ),
+  plot.subtitle = element_text(
+    size = 12,
+    hjust = 0.5,
+    face = "bold"
+  ),
+  axis.title.x = element_text(
+    size = 8,
+    face = "bold"
+  ),
+  plot.caption = element_text(
+    size = 10,
+    hjust = 0.5,
+    face = "italic",
+    color = "gray"
+  )
+)
+
+ grafico
+
+#plotly::ggplotly(grafico)
+
+```
+
+# Ativos
+
+```{r}
+
+df_final <- readRDS("data/df_ativos.rds")
+
+grafico_sem_rotulo <- df_final %>%
+  ggplot(aes(
+    x = faixa_etaria,
+    y = Total,
+    fill = CO_SEXO
+  )
+  ) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("#FF7F0E","#004580")) +
+scale_y_continuous(
+    breaks = seq(-105000, 60000, 45000),
+    labels = paste0(abs(seq(-105000, 60000, 45000)))
+  ) +
+  coord_flip(ylim = c(-105000, 60000))
+  # geom_text(aes(label = abs(Total)), 
+  #           hjust = ifelse(df_final$Total < 0, 1, -0.1),
+  #            position = position_stack(vjust = 0.5),
+  #           color = "#343a40",
+  #           size = 3)
+
+
+
+grafico_sem_rotulo <- grafico_sem_rotulo +
+  labs(
+    title = "Distribuição Etária dos Servidores ",
+    subtitle = "\n\nTotal de Servidores em {closest_state}",
+    y = "",
+    caption = "\nFonte: https://www.gov.br/servidor/pt-br/observatorio-de-pessoal-govbr/"
+  )
+
+grafico_sem_rotulo <-grafico_sem_rotulo + theme(
+  plot.background = element_blank(),
+  axis.ticks = element_blank(),
+  axis.title.y = element_blank(),
+  legend.title = element_blank(),
+  panel.background = element_blank(),
+  panel.border = element_blank(),
+  strip.background = element_blank(),
+  strip.text.x = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.grid.major = element_blank(),
+  axis.text = element_text(size = 10),
+  legend.position = "bottom",
+  legend.key.size = unit(0.75, "cm"),
+  legend.text = element_text(
+    size = 18,
+    face = "bold"
+  ),
+  plot.title = element_text(
+    size = 18,
+    hjust = 0.5,
+    face = "bold",
+    colour = "#343a40"
+  ),
+  plot.subtitle = element_text(
+    size = 15,
+    hjust = 0,
+    face = "bold"
+  ),
+  axis.title.x = element_text(
+    size = 15,
+    face = "bold"
+  ),
+  plot.caption = element_text(
+    size = 15,
+    hjust = 0.5,
+    face = "italic",
+    color = "gray"
+  )
+)
+
+```
+
+```{r}
+library(gganimate)
+library(gifski)
+grafico_sem_rotulo <- grafico_sem_rotulo +
+  transition_states(
+    Ano,
+    transition_length = 3,
+    state_length = 1
+  ) +
+  enter_fade() +
+  exit_fade() +
+  ease_aes('cubic-in-out')
+
+animate(
+  grafico_sem_rotulo,
+  fps = 4,
+  duration = 20,
+  width = 800,
+  height = 500,
+  renderer = gifski_renderer("img/ativos.gif")
+)
+```
+
+
+
+# Ingressos 8.000 a cada ano 
+
+```{r}
+grafico_sem_rotulo <- df_final %>%
+  ggplot(aes(
+    x = faixa_etaria,
+    y = total_ingresso,
+    fill = CO_SEXO
+  )
+  ) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("#FF7F0E","#004580")) +
+  scale_y_continuous(
+    breaks = seq(-105000, 60000, 45000),
+    labels = paste0(abs(seq(-105000, 60000, 45000)))
+  ) +
+  coord_flip(ylim = c(-105000, 60000))
+  # geom_text(aes(label = abs(Total)), 
+  #           hjust = ifelse(df_final$Total < 0, 1, -0.1),
+  #            position = position_stack(vjust = 0.5),
+  #           color = "#343a40",
+  #           size = 3)
+
+
+
+grafico_sem_rotulo <- grafico_sem_rotulo +
+  labs(
+    title = "Distribuição Etária dos Servidores ",
+    subtitle = "\n\nTotal de Servidores em {closest_state}",
+    y = "",
+    caption = "\nFonte: https://www.gov.br/servidor/pt-br/observatorio-de-pessoal-govbr/"
+  )
+
+grafico_sem_rotulo <-grafico_sem_rotulo + theme(
+  plot.background = element_blank(),
+  axis.ticks = element_blank(),
+  axis.title.y = element_blank(),
+  legend.title = element_blank(),
+  panel.background = element_blank(),
+  panel.border = element_blank(),
+  strip.background = element_blank(),
+  strip.text.x = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.grid.major = element_blank(),
+  axis.text = element_text(size = 10),
+  legend.position = "bottom",
+  legend.key.size = unit(0.75, "cm"),
+  legend.text = element_text(
+    size = 18,
+    face = "bold"
+  ),
+  plot.title = element_text(
+    size = 18,
+    hjust = 0.5,
+    face = "bold",
+    colour = "#343a40"
+  ),
+  plot.subtitle = element_text(
+    size = 15,
+    hjust = 0,
+    face = "bold"
+  ),
+  axis.title.x = element_text(
+    size = 15,
+    face = "bold"
+  ),
+  plot.caption = element_text(
+    size = 15,
+    hjust = 0.5,
+    face = "italic",
+    color = "gray"
+  )
+)
+
+```
+
+```{r}
+library(gganimate)
+library(gifski)
+grafico_sem_rotulo <- grafico_sem_rotulo +
+  transition_states(
+    Ano,
+    transition_length = 3,
+    state_length = 1
+  ) +
+  enter_fade() +
+  exit_fade() +
+  ease_aes('cubic-in-out')
+
+animate(
+  grafico_sem_rotulo,
+  fps = 4,
+  duration = 20,
+  width = 800,
+  height = 500,
+  renderer = gifski_renderer("img/ativos.gif")
+)
+```
+
+
+# Separados
+
+```{r}
+grafico <- df_final %>%
+  ggplot(aes(
+    x = faixa_etaria,
+    y = total_ingresso,
+    fill = CO_SEXO
+  )) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("#FF7F0E", "#004580")) +
+  scale_y_continuous(
+    breaks = seq(-105000, 60000, 45000),
+    labels = paste0(abs(seq(-105000, 60000, 45000)))
+  ) +
+  coord_flip(ylim = c(-105000, 60000)) +
+  facet_wrap(vars(Ano))
+  # geom_text(aes(label = abs(Total)), 
+  #           hjust = ifelse(df_final$Total < 0, 1, -0.1),
+  #            position = position_stack(vjust = 0.5),
+  #           color = "#343a40",
+  #           size = 3)
+
+
+
+grafico <- grafico +
+  labs(
+    title = "Distribuição Etária dos Servidores ",
+    y = "", x = "",
+    caption = "\nFonte: https://www.gov.br/servidor/pt-br/observatorio-de-pessoal-govbr/"
+  )
+
+grafico <-grafico + theme(
+  plot.background = element_blank(),
+  axis.ticks = element_blank(),
+  axis.title.y = element_blank(),
+  legend.title = element_blank(),
+  panel.background = element_blank(),
+  panel.border = element_blank(),
+  strip.background = element_blank(),
+  #strip.text.x = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.grid.major = element_blank(),
+  axis.text = element_text(size = 10),
+  legend.position = "bottom",
+  legend.key.size = unit(0.75, "cm"),
+  legend.text = element_text(
+    size = 18,
+    face = "bold"
+  ),
+  plot.title = element_text(
+    size = 18,
+    hjust = 0.5,
+    face = "bold",
+    colour = "#343a40"
+  ),
+  plot.subtitle = element_text(
+    size = 15,
+    hjust = 0,
+    face = "bold"
+  ),
+  axis.title.x = element_text(
+    size = 15,
+    face = "bold"
+  ),
+  plot.caption = element_text(
+    size = 15,
+    hjust = 0.5,
+    face = "italic",
+    color = "gray"
+  )
+)
+grafico
+```
+
+
+# Projeção
+
+```{r}
+library(echarts4r)
+
+graf_linha <- df_final |> dplyr::filter(
+  CO_SEXO == "F",
+  faixa_etaria == "75+ anos - Aposentadoria"
+) |> mutate(
+  
+  Ano = as.factor(Ano),
+  Total =  case_when( 
+    CO_SEXO == "M" ~ Total * -1,
+    TRUE ~ Total
+    )
+) 
+
+graf_linha|> 
+  e_chart( x = Ano) |> 
+  e_line(serie = Total)
+
+```
+
