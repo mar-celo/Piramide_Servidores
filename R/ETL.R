@@ -55,7 +55,7 @@ df_aposen <- aposen |>
 df_aposen <- df_aposen |>  
   mutate(
     faixa_etaria_aposen = factor(
-      faixa_etaria_aposen, levels = c("Menos de 50 anos", "50-54 anos", "55-59 anos", "65-69 anos", "60-64 anos", "70-74 anos", "80-84 anos", "85-89 anos", "75-79 anos", "90+ anos")
+      faixa_etaria_aposen, levels = c("Menos de 50 anos", "50-54 anos", "55-59 anos", "60-64 anos", "65-69 anos",  "70-74 anos", "75-79 anos", "80-84 anos", "85-89 anos",  "90+ anos")
     )
   ) |> 
   group_by(CO_SEXO) |> 
