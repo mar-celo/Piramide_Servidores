@@ -4,10 +4,10 @@ title: "Infográfico de Projeção de Aposentadoria e Pirâmide Etária"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, comment = '', fig.width = 8, fig.height = 8)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, comment = '', fig.width = 8, fig.height = 6)
 ```
 
-# Variável do Tabelão ANO_PRE_APO
+## Variável do Tabelão ANO_PRE_APO
 
 Aproximadamente 75% das observações estão zeradas
 
@@ -26,6 +26,7 @@ df |> ggplot2::ggplot() +
 
 ```{r}
 library(tidyverse)
+library(scales)
 df_aposen <- readRDS("data/df_aposen.rds")
 
 grafico <- df_aposen %>%
@@ -38,13 +39,15 @@ grafico <- df_aposen %>%
   geom_bar(stat = "identity") +
   scale_fill_manual(values = c("#FF7F0E","#004580")) +
   scale_y_continuous(
-    breaks=seq(-55000,50000,25000),
+    breaks=seq(-85000,105000,25000),
     labels=paste0(
-      abs(seq(-55000,50000,25000)
+      abs(seq(-85000,105000,25000)
           ))
     )+
-  coord_flip() + 
-  geom_text(aes(label = abs(Total)), 
+  coord_flip(ylim = c(-60000, 60000)) + 
+  geom_text(label = label_number(scale = 1,
+                              big.mark = ".",
+                              decimal.mark = ",")(abs(df_aposen$Total)), 
             hjust = ifelse(df_aposen$Total < 0, 1, -0.1),
     #         position = position_stack(vjust = 0.5),
     color = "#343a40",
@@ -112,25 +115,26 @@ grafico <- grafico + theme(
 
 df_final <- readRDS("data/df_ativos.rds")
 
-grafico_sem_rotulo <- df_final %>%
+grafico_sem_rotulo <- df_final  |> 
   ggplot(aes(
     x = faixa_etaria,
     y = Total,
     fill = CO_SEXO
-  )
-  ) +
+  )) +
   geom_bar(stat = "identity") +
   scale_fill_manual(values = c("#FF7F0E","#004580")) +
 scale_y_continuous(
-    breaks = seq(-105000, 60000, 45000),
-    labels = paste0(abs(seq(-105000, 60000, 45000)))
+    breaks = seq(-105000, 80000, 45000),
+    labels = paste0(abs(seq(-105000, 80000, 45000)))
   ) +
-  coord_flip(ylim = c(-105000, 60000))
-  # geom_text(aes(label = abs(Total)), 
-  #           hjust = ifelse(df_final$Total < 0, 1, -0.1),
-  #            position = position_stack(vjust = 0.5),
-  #           color = "#343a40",
-  #           size = 3)
+  coord_flip(ylim = c(-105000, 80000)) + 
+  geom_text(aes(label = label_number(scale = 1,
+                              big.mark = ".",
+                              decimal.mark = ",")(abs(df_final$Total))), 
+            hjust = ifelse(df_final$Total < 0, 1, -0.1),
+            #position = position_stack(vjust = 0.5),
+            color = "#343a40",
+            size = 3)
 
 
 
@@ -185,14 +189,14 @@ grafico_sem_rotulo <-grafico_sem_rotulo + theme(
 
 ```
 
-```{r}
+```{r fig.width=10}
 library(gganimate)
 library(gifski)
 grafico_sem_rotulo <- grafico_sem_rotulo +
   transition_states(
     Ano,
-    transition_length = 3,
-    state_length = 1
+    transition_length = 0,
+    state_length = 5
   ) +
   enter_fade() +
   exit_fade() +
@@ -223,15 +227,17 @@ grafico_sem_rotulo <- df_final %>%
   geom_bar(stat = "identity") +
   scale_fill_manual(values = c("#FF7F0E","#004580")) +
   scale_y_continuous(
-    breaks = seq(-105000, 60000, 45000),
-    labels = paste0(abs(seq(-105000, 60000, 45000)))
+    breaks = seq(-105000, 80000, 45000),
+    labels = paste0(abs(seq(-105000, 80000, 45000)))
   ) +
-  coord_flip(ylim = c(-105000, 60000))
-  # geom_text(aes(label = abs(Total)), 
-  #           hjust = ifelse(df_final$Total < 0, 1, -0.1),
-  #            position = position_stack(vjust = 0.5),
-  #           color = "#343a40",
-  #           size = 3)
+  coord_flip(ylim = c(-105000, 80000)) +
+  geom_text(label = label_number(scale = 1,
+                              big.mark = ".",
+                              decimal.mark = ",")(abs(df_final$total_ingresso)), 
+            hjust = ifelse(df_final$total_ingresso < 0, 1, -0.1),
+            # position = position_stack(vjust = 0.5),
+            color = "#343a40",
+            size = 3)
 
 
 
@@ -292,8 +298,8 @@ library(gifski)
 grafico_sem_rotulo <- grafico_sem_rotulo +
   transition_states(
     Ano,
-    transition_length = 3,
-    state_length = 1
+    transition_length = 0,
+    state_length = 5
   ) +
   enter_fade() +
   exit_fade() +
@@ -322,10 +328,10 @@ grafico <- df_final %>%
   geom_bar(stat = "identity") +
   scale_fill_manual(values = c("#FF7F0E", "#004580")) +
   scale_y_continuous(
-    breaks = seq(-105000, 60000, 45000),
-    labels = paste0(abs(seq(-105000, 60000, 45000)))
+    breaks = seq(-105000, 80000, 45000),
+    labels = paste0(abs(seq(-105000, 80000, 45000)))
   ) +
-  coord_flip(ylim = c(-105000, 60000)) +
+  coord_flip(ylim = c(-105000, 80000)) +
   facet_wrap(vars(Ano))
   # geom_text(aes(label = abs(Total)), 
   #           hjust = ifelse(df_final$Total < 0, 1, -0.1),
