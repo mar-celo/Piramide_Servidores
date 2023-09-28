@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, comment = 
 
 ## Variável do Tabelão ANO_PRE_APO
 
-Aproximadamente 75% das observações estão zeradas
+O histograma abaixo foi para explicar que não utilizamos a variável ANO_PRE_APO do tabelão, pois aproximadamente 75% das observações estão zeradas.
 
 
 ```{r fig.height=5, fig.width=6}
@@ -22,7 +22,9 @@ df |> ggplot2::ggplot() +
 ```
 
 
-# Piramide Etária dos Aposentados
+## Piramide Etária dos Aposentados
+
+Foi desenvolvido um gráfico de pirâmide para os aposentados, considerando as faixas etárias dos servidores com base em suas idades:
 
 ```{r}
 library(tidyverse)
@@ -113,7 +115,13 @@ grafico <- grafico + theme(
 
 ```
 
-# Ativos
+## Servidores Ativos
+
+"Foram definidas faixas etárias (a cada cinco anos) para os servidores ativos, com base em suas idades atuais.
+
+No ano de 2028, ocorre a transição de faixa etária para os servidores, evidenciando o acúmulo gradual dos totais em faixas etárias superiores.
+
+O mesmo padrão se repete nos anos de 2033 e 2038, sendo que neste último ano, ocorre a acumulação de servidores na faixa etária **75+ anos - Aposentadoria**, devido ao alcance da idade compulsória para a aposentadoria."
 
 ```{r}
 
@@ -222,7 +230,13 @@ animate(
 
 
 
-# Ingressos 8.000 a cada ano 
+## Simulando um total de ingressos de Servidores a cada período
+
+Foi adotado um cenário hipotético de 8.000 novos ingressos de servidores a cada ano, na faixa etária de **25-29 anos**.
+
+Dessa forma, ao longo de um período de 5 anos, teremos um acréscimo total de 40.000 novos servidores, distribuídos igualmente por sexo, resultando em 20.000 ingressos para cada grupo.
+
+Observa-se que o padrão de comportamento desse gráfico assemelha-se ao mencionado anteriormente, onde a cada intervalo de cinco anos, os servidores alteram suas faixas etárias.
 
 ```{r}
 grafico_sem_rotulo <- df_final %>%
@@ -324,7 +338,9 @@ animate(
 ```
 
 
-# Separados
+## Separados
+
+Apenas para demostração cada gráfico separado. 
 
 ```{r}
 grafico <- df_final %>%
@@ -400,7 +416,13 @@ grafico
 ```
 
 
-# Projeção
+## Projeção
+
+Neste gráfico, foi representada a evolução do número total de servidores por sexo na última faixa etária, 75+ anos - Aposentadoria. Nesse contexto, partimos da premissa de que os servidores se aposentam compulsoriamente.
+
+É importante ressaltar que esses valores podem variar, pois os servidores podem se aposentar antes da idade compulsória, e o cálculo não considera o total de falecimentos.
+
+
 
 ```{r}
 library(echarts4r)
